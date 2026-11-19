@@ -12,3 +12,4 @@ jobs:  # a job : one runner machine
                 nproc             #how many cpus this machine has
                 free -h           #how much memory and -h formats in human readable form
                 docker --version  #docker is pre installed
+                exit 1

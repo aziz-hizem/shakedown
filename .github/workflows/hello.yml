@@ -1,0 +1,14 @@
+name: hello  #name shown on the PR check
+
+on: pull_request #the event : run when a PR is opened or updated
+
+jobs:  # a job : one runner machine
+    inspect-runner : #a job named inspect-runner
+        runs-on: ubuntu-latest #ask github for a fresh ubuntu VM
+        steps:
+            - name: Who am I running on ? 
+              run: | # "|" = several shell commands follow (in our case to display info)
+                uname -a          #linux kernel version
+                nproc             #how many cpus this machine has
+                free -h           #how much memory and -h formats in human readable form
+                docker --version  #docker is pre installed

@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 
 class DockerError(Exception):
@@ -17,3 +18,14 @@ def image_size(image: str) -> int:
         raise DockerError(result.stderr.strip())
 
     return int(result.stdout.strip())
+
+
+def build_image(context: bytes, tag: str) -> None:
+    """Build an image from a build context packed as a tar archive"""
+    result = subprocess.run(
+        ["docker", "build", "--tag", tag, "-"],
+        input=context,
+        stdout=sys.stderr,
+    )
+    if result.returncode != 0:
+        raise DockerError(f"docker build failed for {tag}")

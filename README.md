@@ -50,9 +50,9 @@ flowchart LR
 | ✅ | Sample app to test against (`examples/hello-app`) |
 | ✅ | Installable command-line tool (`shakedown`) |
 | ✅ | Read an image's size from Docker (`shakedown size`) |
-| 🔨 | Build main and the PR from git and compare them (`shakedown compare`) |
-| ⏳ | Report + merge gate (exit code), Markdown comment on the PR |
-| ⏳ | GitHub Action wrapper, running on every pull request |
+| ✅ | Build main and the PR from git and compare them (`shakedown compare`) |
+| ✅ | Markdown report + merge gate (exit code) |
+| ⏳ | GitHub Action wrapper: runs on every pull request and posts the report as a comment|
 | ⏳ | Test-deploy both versions in a temporary Kubernetes cluster (kind) |
 | ⏳ | Linux image checks: added packages, running as root, setuid files, resource usage |
 | ⏳ | Vulnerability comparison (Trivy) |

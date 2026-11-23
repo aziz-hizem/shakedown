@@ -4,25 +4,30 @@ from importlib.metadata import version
 
 from shakedown.docker import DockerError, build_image, image_size
 from shakedown.git import GitError, archive
-
-
-def format_size(size_bytes: int) -> str:
-    return f"{size_bytes / 1_000_000:.1f} MB"
+from shakedown.report import build_failure_report, format_size, size_report
 
 
 def run_compare(base: str, head: str, path: str) -> int:
-    sizes = {}
-    for name, ref in [("base", base), ("head", head)]:
-        tag = f"shakedown-check:{name}"
-        print(f"building {name} ({ref})...", file=sys.stderr)
-        try:
-            build_image(archive(ref, path), tag)
-            sizes[name] = image_size(tag)
-        except (GitError, DockerError) as error:
-            print(f"error: {error}", file=sys.stderr)
-            return 1
-    print(f"base ({base}): {format_size(sizes['base'])}")
-    print(f"head ({head}): {format_size(sizes['head'])}")
+    try:
+        print(f"building base ({base})...", file=sys.stderr)
+        build_image(archive(base, path), "shakedown-check:base")
+        base_size = image_size("shakedown-check:base")
+    except (GitError, DockerError) as error:
+        print(f"error: could not build {base}: {error}", file=sys.stderr)
+        return 1
+
+    try:
+        print(f"building head ({head})...", file=sys.stderr)
+        build_image(archive(head, path), "shakedown-check:head")
+        head_size = image_size("shakedown-check:head")
+    except GitError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+    except DockerError:
+        print(build_failure_report(head))
+        return 1
+
+    print(size_report(base, head, base_size, head_size))
     return 0
 
 
@@ -45,7 +50,7 @@ def main() -> int:
 
     # Compare subcommand
     compare_parser = subcommands.add_parser(
-        "compare", help="build two version of an app and compare them"
+        "compare", help="build two versions of an app and compare them"
     )
     compare_parser.add_argument(
         "--base", required=True, help="git ref to compare against, e.g, main"
